@@ -58,6 +58,9 @@ services:
     env_file: .env
     depends_on:
       - mariadb.indi.allsky
+    privileged: true  # needed for GPIO access in form validation
+    devices:
+      - /dev/gpiochip0  # main GPIO chip for RPi5
     volumes:
       - images_indi_allsky:/var/www/html/allsky
       - migrations_indi_allsky:/var/lib/indi-allsky

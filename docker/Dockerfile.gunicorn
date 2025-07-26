@@ -21,7 +21,12 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN groupadd --gid 10001 allsky \
-    && useradd --create-home --no-user-group --uid 10001 --gid allsky --home-dir /home/allsky --shell /bin/bash allsky
+    && useradd --create-home --no-user-group --uid 10001 --gid allsky --groups dialout,video --home-dir /home/allsky --shell /bin/bash allsky
+
+# Add allsky user to GPIO, I2C, and SPI groups (same as indi_base)
+RUN if getent group gpio >/dev/null 2>&1; then usermod -a -G gpio allsky; fi
+RUN if getent group i2c >/dev/null 2>&1; then usermod -a -G i2c allsky; fi
+RUN if getent group spi >/dev/null 2>&1; then usermod -a -G spi allsky; fi
 
 RUN echo "allsky ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/allsky
 RUN chmod 0440 /etc/sudoers.d/allsky
