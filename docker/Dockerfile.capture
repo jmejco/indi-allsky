@@ -71,7 +71,7 @@ RUN export CC=clang \
 # Add GPIO_PYTHON_MODULES as build argument with default false (non-breaking change)
 ARG GPIO_PYTHON_MODULES=false
 
-# Install GPIO requirements first (following setup.sh logic)
+# Install GPIO requirements first 
 RUN if [ "${GPIO_PYTHON_MODULES}" = "true" ]; then \
         /home/allsky/venv/bin/pip3 install --no-cache-dir -r requirements_gpio.txt ; \
     fi

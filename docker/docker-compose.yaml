@@ -44,8 +44,8 @@ services:
     ports:
       - "17624:7624"
   ### Uncomment to connect to gpsd running on the host (listening to all interfaces)
-  #  extra_hosts:
-  #    - "localhost:host-gateway"
+    extra_hosts:
+      - "localhost:host-gateway"
 
 
   gunicorn.indi.allsky:
@@ -53,6 +53,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.gunicorn
+      args:
+        - GPIO_PYTHON_MODULES=true
     env_file: .env
     depends_on:
       - mariadb.indi.allsky

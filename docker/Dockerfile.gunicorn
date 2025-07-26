@@ -29,7 +29,7 @@ RUN chmod 0440 /etc/sudoers.d/allsky
 
 COPY requirements/requirements_latest_web.txt /home/allsky
 #COPY requirements/requirements_optional.txt /home/allsky
-#COPY requirements/requirements_gpio.txt /home/allsky
+COPY requirements/requirements_gpio.txt /home/allsky
 
 
 USER root
@@ -56,10 +56,27 @@ RUN python3 -m venv /home/allsky/venv
 ENV VIRTUAL_ENV=/home/allsky/venv
 
 
+# Add GPIO_PYTHON_MODULES as build argument with default false (non-breaking change)
+ARG GPIO_PYTHON_MODULES=false
+
 RUN export CC=clang \
     && export CXX=clang++ \
     && /home/allsky/venv/bin/pip3 install --no-cache-dir --upgrade pip setuptools wheel packaging \
     && /home/allsky/venv/bin/pip3 install --no-cache-dir -r requirements_latest_web.txt
+
+# Install GPIO requirements first (following setup.sh logic) - needed for web UI form validation
+RUN if [ "${GPIO_PYTHON_MODULES}" = "true" ]; then \
+        /home/allsky/venv/bin/pip3 install --no-cache-dir -r requirements_gpio.txt ; \
+    fi
+
+# Then apply RPi5 patch - replace rpi.gpio module with rpi.lgpio for ARM architecture
+RUN if [ "${GPIO_PYTHON_MODULES}" = "true" ]; then \
+        CPU_ARCH=$(uname -m) \
+        && if [ "$CPU_ARCH" = "aarch64" ] || [ "$CPU_ARCH" = "armv7l" ]; then \
+            /home/allsky/venv/bin/pip3 uninstall -y RPi.GPIO rpi.lgpio || true \
+            && /home/allsky/venv/bin/pip3 install --no-cache-dir rpi-lgpio ; \
+        fi ; \
+    fi
 
 
 USER root
