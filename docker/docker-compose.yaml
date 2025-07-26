@@ -70,12 +70,14 @@ services:
       additional_contexts:
         indi.base: "service:indi.base"
       dockerfile: docker/Dockerfile.capture
+      args:
+        - GPIO_PYTHON_MODULES=true
     env_file: .env
     depends_on:
       - indi.base
       - mariadb.indi.allsky
       - indiserver.indi.allsky
-    #privileged: true  # enable for libcamera
+    privileged: true  # enable for GPIO/i2c device access and libcamera
     volumes:
       - images_indi_allsky:/var/www/html/allsky
       #- /run/udev:/run/udev:ro  # enable for libcamera
