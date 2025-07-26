@@ -28,7 +28,7 @@ RUN chown -R allsky:allsky /home/allsky/indi-allsky
 
 
 RUN rm -f /usr/local/apache2/conf/httpd.conf
-COPY docker/apache.local.conf /usr/local/apache2/conf/httpd.conf
+COPY docker/apache.traefik.conf /usr/local/apache2/conf/httpd.conf
 RUN sed \
     -i \
     -e "s|%INDIALLSKY_IMAGE_FOLDER%|$INDIALLSKY_IMAGE_FOLDER|g" \
